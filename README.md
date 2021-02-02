@@ -86,45 +86,46 @@ fun startGedditSDK(context: Context, view: View){
 }
 
 3. We have 4 important delegates which allows client to receive events when the actions are performed in our SDK.
+
       1.  when user interacts with the product listed on a show:
         
-  interface GedditLiveCommerceListener {   
-    fun onReady(helper: GedditLiveCommerceActionListener)
-    fun onCollectionImageClicked(context: Context, product: Product)
-    fun onCollectionAddToBagClicked(context: Context, product: Product)
- }
+          interface GedditLiveCommerceListener {   
+            fun onReady(helper: GedditLiveCommerceActionListener)
+            fun onCollectionImageClicked(context: Context, product: Product)
+            fun onCollectionAddToBagClicked(context: Context, product: Product)
+         }
     
    
       2. When user plays trivia :
       
          
-interface QuizDelegate {
-    fun didAnswerCorrectlyQuestion(question: String, answer: String)
-    fun didAnswerIncorrectlyQuestion(question: String, answer: String)
-}
+        interface QuizDelegate {
+            fun didAnswerCorrectlyQuestion(question: String, answer: String)
+            fun didAnswerIncorrectlyQuestion(question: String, answer: String)
+        }
 
      
 3. when user win a voucher:
 
 
-interface VoucherDelegate: Serializable {
-    fun didWinVoucher(voucher: Voucher)
-}
+        interface VoucherDelegate: Serializable {
+            fun didWinVoucher(voucher: Voucher)
+        }
 
 4. Picture in Picture Mode delegate:
 
 
-interface GedditLiveCommerceActionListener: Serializable {
-    fun enterPIP()
-    fun exitPIP()
-    fun exitPIP(product: Product)
-}
+        interface GedditLiveCommerceActionListener: Serializable {
+            fun enterPIP()
+            fun exitPIP()
+            fun exitPIP(product: Product)
+        }
 
 Requirements:
 
 
- Android Studio 4.0.1 or above
- Gradle  gradle-6.1.1-all.zip or above
- Kotlin 1.3.50 or above
+         Android Studio 4.0.1 or above
+         Gradle  gradle-6.1.1-all.zip or above
+         Kotlin 1.3.50 or above
 
 Now Client can start our SDK and use the features in their existing App.
