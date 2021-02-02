@@ -96,19 +96,23 @@ fun startGedditSDK(context: Context, view: View){
     
    
       2. When user plays trivia :
+      
          
 interface QuizDelegate {
     fun didAnswerCorrectlyQuestion(question: String, answer: String)
     fun didAnswerIncorrectlyQuestion(question: String, answer: String)
 }
+
      
 3. when user win a voucher:
+
 
 interface VoucherDelegate: Serializable {
     fun didWinVoucher(voucher: Voucher)
 }
 
 4. Picture in Picture Mode delegate:
+
 
 interface GedditLiveCommerceActionListener: Serializable {
     fun enterPIP()
@@ -117,6 +121,8 @@ interface GedditLiveCommerceActionListener: Serializable {
 }
 
 Requirements:
+
+
  Android Studio 4.0.1 or above
  Gradle  gradle-6.1.1-all.zip or above
  Kotlin 1.3.50 or above
