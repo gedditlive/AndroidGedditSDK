@@ -1,131 +1,218 @@
-# AndroidGedditSDK
-This is the way how one can integrate our SDK.
+# Geddit Commerce SDK
 
+* [Get Started](#get-started)
+	* [Installation](#installation)
+		* [Gradle](#gradle)
+	* [Initialize Commerce SDK](#initialize-commerce-sdk)
+	* [Display Live Stream](#display-live-stream)
+	* [Close Live Stream](#close-live-stream)
+	* [Picture In Picture](#picture-in-picture)
+		* [Expand To Go Back To Live Stream View](#expand-to-go-back-to-live-stream-view)
+		* [Enter PIP View](#enter-pip-view)
+* [Delegate](#delegate)
+	* [Product View Delegate](#product-view-delegate)
+	* [Picture In Picture Delegate](#picture-in-picture-delegate)
+	* [Voucher Delegate](#voucher-delegate)
+* [Dependencies](#dependencies)
+	* [3rd party](#3rd-party)
+* [Requirements](#requirements)
+* [Release Process](#release)
 
-Integration Process of Our Android-SDK.
+## Get Started
 
-We have very easy to integrate SDK released on popular distribution network Bintray. For a client to integrate our SDK in their current Android Application, they require to follow following steps.
-1. The client need to include following two dependencies in their app.gradle file.
+### Installation
 
+#### Gradle
+
+Add the following dependency to your `app.gradle` file:
+
+```kotlin
 implementation 'com.geddit.live.sdk:core:1.0.14'(Version may vary)
 implementation 'com.geddit.live.sdk:commerce:1.0.21'(Version may vary)
+```
 
-2. Next they need to initialise our SDK at the point where client wish to using our Builder class providing essential information about the client’s app and user details.
+### Initialize Commerce SDK
 
-fun startGedditSDK(context: Context, view: View){
-
-    val sharePrefHelper = SharePrefHelper(context)
-    val userIdPref = sharePrefHelper.getString(
-        VerifyActivity.USER_ID_PREF_KEY,
-        "5cb830cd117cc61866a25fca") ?: ""
-    val namePref = sharePrefHelper.getString(
-        VerifyActivity.NAME_PREF_KEY,
-        "Chihiro") ?: ""
-    val emailPref = sharePrefHelper.getString(
-        VerifyActivity.EMAIL_PREF_KEY,
-        "snuxker@mail.com") ?: ""
-    val mobileNumberPref = sharePrefHelper.getString(
-        VerifyActivity.MOBILE_PREF_KEY,
-        "+66894587114") ?: ""
-    val imageUrlPref = sharePrefHelper.getString(
-        VerifyActivity.IMAGE_URL_PREF_KEY,
-        "https://www.prapagorn.com/images/avatar.jpg") ?: ""
-    val appIdPref = BuildConfig.APP_ID
-    val appSecretPref = BuildConfig.APP_SECRET
-    val geddit = GedditLiveCommerce.Builder(
-        context,
-        appIdPref,
-        appSecretPref,
-        userIdPref,
-        namePref,
-        "THB",
-        object: GedditLiveCommerce.GedditLiveCommerceListener{
-
-            override fun onCollectionImageClicked(context: Context, product: Product) {
-                GedditHelper.helper?.enterPIP()
-                startProductDetail(context, product)
-            }
-
-            override fun onCollectionAddToBagClicked(context: Context, product: Product) {
-                showSizeSelection(
-                    context,
-                    view,
-                    product
-                )
-            }
-
-            override fun onReady(helper:  GedditLiveCommerce.GedditLiveCommerceActionListener) {
-                GedditHelper.helper = helper
-            }
-        },
-        object: VoucherDelegate {
-            override fun didWinVoucher(voucher: Voucher) {
-                Log.d("Voucher_delegate","Voucher id"+voucher.voucherId+" Voucher Code "+voucher.voucherCode+" Voucher Description "+voucher.voucherDescription)
-            }
-        },
-        object : QuizDelegate {
-            override fun didAnswerCorrectlyQuestion(question: String, answer: String) {
-                Log.d("didAnswerCorrectly","question "+question+" answer "+answer)
-
-            }
-            override fun didAnswerIncorrectlyQuestion(question: String, answer: String) {
-                Log.d("didAnswerIncorrectly","question "+question+" answer "+answer)
-
-            }
+```kotlin
+val sdk = GedditLiveCommerce.Builder(
+    context,
+    "12359616-26f7-4b21-9e26-2ce766d5c6ed",
+    "ba822b68b152f015730380224c525021",
+    "12345",
+    "TestUser",
+    "THB",
+    object: GedditLiveCommerce.GedditLiveCommerceListener {
+        override fun onCollectionImageClicked(context: Context, product: Product) {
+            
         }
-        )
-        .email(emailPref)
-        .imageUrl(imageUrlPref)
-        .gender(Gender.MALE) // Gender.MALE, Gender.FEMALE, Gender.OTHER
-        .mobileNumber(mobileNumberPref)
-        .languageCode("en")
-        .fcmToken("")
-        .debuggable(BuildConfig.DEBUG)
+        override fun onCollectionAddToBagClicked(context: Context, product: Product) {
+            
+        }
+        override fun onReady(helper:  GedditLiveCommerce.GedditLiveCommerceActionListener) {
+            
+        }
+    },
+    object: VoucherDelegate {
+        override fun didWinVoucher(voucher: Voucher) {
+            // Called when user won a voucher.
+        }
+    },
+    object : QuizDelegate {
+        override fun didAnswerCorrectlyQuestion(question: String, answer: String) {
+            // Called when user answered correctly.
 
-     GedditLiveCommerce.with(geddit.build())
-}
-
-3. We have 4 important delegates which allows client to receive events when the actions are performed in our SDK.
-
-      1.  when user interacts with the product listed on a show:
-        
-          interface GedditLiveCommerceListener {   
-            fun onReady(helper: GedditLiveCommerceActionListener)
-            fun onCollectionImageClicked(context: Context, product: Product)
-            fun onCollectionAddToBagClicked(context: Context, product: Product)
-         }
+        }
+        override fun didAnswerIncorrectlyQuestion(question: String, answer: String) {
+            // Called when user answered incorrectly.
+        }
+    }
+    )
+    .email("test@gmail.com")
+    .gender(Gender.MALE)
+    .mobileNumber("+66612345678")
+    .languageCode("en")
+    .fcmToken("")
+    .debuggable(BuildConfig.DEBUG)
     
-   
-      2. When user plays trivia :
-      
-         
-        interface QuizDelegate {
-            fun didAnswerCorrectlyQuestion(question: String, answer: String)
-            fun didAnswerIncorrectlyQuestion(question: String, answer: String)
-        }
+GedditLiveCommerce.with(sdk.build())
+```
 
+### Display Live Stream
+
+```kotlin
+GedditLiveCommerce.with(sdk.build())
+```
+
+### Close Live Stream
+
+```kotlin
+GedditHelper.helper?.dismissLiveStream()
+```
+
+### Picture In Picture
+
+#### Expand To Go Back To Live Stream View
+
+```kotlin
+GedditHelper.helper?.exitPIP()
+```
+
+#### Enter PIP View
+
+```kotlin
+GedditHelper.helper?.enterPIP()
+```
+
+## Delegate
+
+### Product View Delegate
+
+`GedditLiveCommerceListener` allows you to create your custom product view and manage its life cycle.
+
+```kotlin
+{
+    override fun onCollectionImageClicked(context: Context, product: Product) {
+        
+    }
+    override fun onCollectionAddToBagClicked(context: Context, product: Product) {
+        
+    }
+    override fun onReady(helper: GedditLiveCommerceActionListener) {
+        
+    }
+}
+```
+
+You can initialize the SDK with your product delegate implementation.
+
+```kotlin
+    object: GedditLiveCommerce.GedditLiveCommerceListener {
+        override fun onCollectionImageClicked(context: Context, product: Product) {
+            
+        }
+        override fun onCollectionAddToBagClicked(context: Context, product: Product) {
+            
+        }
+        override fun onReady(helper:  GedditLiveCommerce.GedditLiveCommerceActionListener) {
+            
+        }
+    }
+```
+
+### Picture In Picture Delegate
+
+`GedditLiveCommerceActionListener` allows you to control when picture in picture view is
+closed or tapped.
+
+```kotlin
+{
+     override fun enterPIP() {
      
-3. when user win a voucher:
+     }
+     override fun exitPIP() {
+     
+     }
+     override fun exitPIP(product: Product) {
+     
+     }
+}
+```
 
+You can call  PIP delegate implementation.
 
-        interface VoucherDelegate: Serializable {
-            fun didWinVoucher(voucher: Voucher)
+```kotlin
+GedditLiveCommerce.helper?.enterPIP()
+```
+
+By default clicking on PIP brings you to the live stream and closing the PIP causes closing 
+SDK. If you want to change this behaviour, please conform to 
+`GedditLiveCommerceActionListener`.
+
+### Voucher Delegate
+
+`GedditCommerceVoucherDelegate` allows you to get called back when user won a voucher.
+
+```kotlin
+{
+    override fun didWinVoucher(voucher: Voucher) {
+        // Called when user won a voucher.
+    }
+}
+```
+
+You can initialize SDK with your voucher delegate implementation.
+
+```kotlin
+ object: VoucherDelegate {
+        override fun didWinVoucher(voucher: Voucher) {
+            // Called when user won a voucher.
         }
+    }
+```
 
-4. Picture in Picture Mode delegate:
+## Dependencies
 
+We make heavy use of the following projects, and so it can be helpful to be 
+familiar with them:
 
-        interface GedditLiveCommerceActionListener: Serializable {
-            fun enterPIP()
-            fun exitPIP()
-            fun exitPIP(product: Product)
-        }
+### 3rd Party
 
-Requirements:
+* [`rajawali`](https://github.com/Rajawali/Rajawali/): Rajawali is a 3D engine for Android based on OpenGL ES 2.0/3.0. It can be used for normal apps as well as live wallpapers.
+* [`Konfetti`](https://github.com/DanielMartinus/Konfetti): Celebrate more with this lightweight confetti particle system.
+* [`Glide`](https://github.com/bumptech/glide): Glide is a fast and efficient open source media management and image loading framework for Android that wraps media decoding, memory and disk caching, and resource pooling into a simple and easy to use interface.
+* [`Retrofit`](https://github.com/square/retrofit): A type-safe HTTP client for Android and Java.
+* [`OkHttp`](https://github.com/square/okhttp): OkHttp is an HTTP client that’s efficient by default.
+* [`Koin`](https://github.com/InsertKoinIO/koin): A pragmatic lightweight dependency injection framework for Kotlin developers.
+* [`RxJava`](https://github.com/ReactiveX/RxJava): RxJava is a Java VM implementation of Reactive Extensions: a library for composing asynchronous and event-based programs by using observable sequences.
+* [`Socket.IO`](https://github.com/socketio/socket.io-client-java): This is the Socket.IO Client Library for Java, which is simply ported from the JavaScript client.
+* [`logger`](https://github.com/orhanobut/logger): Simple, pretty and powerful logger for android.
+* [`AnimationEasingFunctions`](https://github.com/daimajia/AnimationEasingFunctions): This project is originally from my another project, AndroidViewAnimation, which is an animation collection, to help you make animation easier.
+* [`AndroidViewAnimations`](https://github.com/daimajia/AndroidViewAnimations): Android basic animations.
+* [`Shimmer`](https://github.com/facebook/shimmer-android): Shimmer is an Android library that provides an easy way to add a shimmer effect to any view in your Android app.
+* [`Push Down Animation Click`](https://github.com/TheKhaeng/pushdown-anim-click): A library for Android developers who want to create "push down animation click" for view like spotify application.
 
+## Requirements
 
-         Android Studio 4.0.1 or above
-         Gradle  gradle-6.1.1-all.zip or above
-         Kotlin 1.3.50 or above
-
-Now Client can start our SDK and use the features in their existing App.
+* Android Studio 4.0.1+
+* Gradle 6.1.1+
+* Kotlin 1.3.50+.
